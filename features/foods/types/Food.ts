@@ -10,7 +10,7 @@ export interface IFoodDto {
     imagePath?: string | null;
 }
 
-export interface IFoodDetailDto extends IFoodDto{
+export interface IFoodDetailDto extends IFoodDto {
     ingredients: IIngredientsOfFoodDto[];
 }
 
@@ -32,4 +32,7 @@ export interface IUpdateFoodDto {
 
 export interface IFoodQueryParams {
     categoryId?: string
+    search?: string
+    includedIngredientIds?: string[]
+    excludedIngredientIds?: string[]
 }

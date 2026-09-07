@@ -25,7 +25,10 @@ export async function GetAllFoods(
 
 
     const { data } = await api.get<IFoodDto[]>("/Food", {
-        params
+        params,
+        paramsSerializer: {
+            indexes: null,  // این اون [] از URL حذف کرد تا با بک اند به خوبی ارتباط بگیره
+        },
     })
 
     return data;

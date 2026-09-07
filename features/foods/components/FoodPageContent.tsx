@@ -12,16 +12,26 @@ import {
 import { parseApiError } from "@/utils/apiError";
 import { getFoodImageUrl } from "@/utils/image";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { IFoodQueryParams } from "../types/Food";
+import FoodFilter from "./foodFilter";
 
 export default function FoodPageContent() {
+
+  const [filter, setFilter] = useState<IFoodQueryParams>({
+    search: "",
+    categoryId: undefined,
+    includedIngredientIds: [],
+    excludedIngredientIds: [],
+  });
+
+  console.log("CURRENT FILTER:", filter);
 
   const searchParams = useSearchParams();
 
   const categoryId = searchParams.get("categoryId");
 
-  const { data, isLoading, isError, error } = useGetAllFoods({
-    categoryId: categoryId ?? undefined
-  });
+  const { data, isLoading, isError, error } = useGetAllFoods(filter);
 
   const parsedError = isError ? parseApiError(error) : null;
 
@@ -39,31 +49,40 @@ export default function FoodPageContent() {
     );
   }
 
-  if (!data?.length) {
-    return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-16 text-center">
-        <span className="mb-3 text-5xl">🍽️</span>
+  // if (!data?.length) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-16 text-center">
+  //       <span className="mb-3 text-5xl">🍽️</span>
 
-        <h3 className="text-lg font-bold text-slate-800">
-          هنوز غذایی ثبت نشده
-        </h3>
+  //       <h3 className="text-lg font-bold text-slate-800">
+  //         هنوز غذایی ثبت نشده
+  //       </h3>
 
-        <p className="mt-1 text-sm text-slate-500">
-          غذاهای جدید پس از ثبت، اینجا نمایش داده می‌شوند.
-        </p>
-      </div>
-    );
-  }
+  //       <p className="mt-1 text-sm text-slate-500">
+  //         غذاهای جدید پس از ثبت، اینجا نمایش داده می‌شوند.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-      {data.map((food) => {
+    <>
+
+      <FoodFilter
+        filter={filter}
+        setFilter={setFilter}
+      />
+
+      <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+
+        {data?.length ? (
+          data.map((food) => {
 
 
-        return (
-          <article
-            key={food.id}
-            className="
+            return (
+              <article
+                key={food.id}
+                className="
               group relative flex flex-col overflow-hidden rounded-3xl
               border border-slate-200/80 bg-white p-2.5
               shadow-[0_4px_20px_rgba(15,23,42,0.05)]
@@ -73,36 +92,36 @@ export default function FoodPageContent() {
               hover:shadow-[0_18px_45px_rgba(16,185,129,0.14)]
               active:scale-90
             "
-          >
-            {/* تصویر */}
-            <Link
-              href={`/food/${food.id}`}
-              className="
+              >
+                {/* تصویر */}
+                <Link
+                  href={`/food/${food.id}`}
+                  className="
                 relative block h-44 w-full overflow-hidden rounded-2xl
                 outline-none
                 focus-visible:ring-2
                 focus-visible:ring-emerald-500
                 focus-visible:ring-offset-2
               "
-            >
-              <img
-                src={getFoodImageUrl(food.imagePath)}
-                alt={food.name}
+                >
+                  <img
+                    src={getFoodImageUrl(food.imagePath)}
+                    alt={food.name}
 
-                sizes="
+                    sizes="
                   (max-width: 640px) 100vw,
                   (max-width: 1024px) 50vw,
                   25vw
                 "
-                className="
+                    className="
                   absolute inset-0 h-full w-full object-cover
                   object-center
                 "
-              />
+                  />
 
-              {/* Badge دسته‌بندی */}
-              <span
-                className="
+                  {/* Badge دسته‌بندی */}
+                  <span
+                    className="
                   absolute right-3 top-3
                   max-w-[calc(100%-1.5rem)]
                   truncate rounded-full
@@ -117,26 +136,26 @@ export default function FoodPageContent() {
                   duration-300
                   group-hover:bg-emerald-600/90
                 "
-              >
-                {food.categoryName}
-              </span>
-            </Link>
+                  >
+                    {food.categoryName}
+                  </span>
+                </Link>
 
-            {/* محتوا */}
-            <div className="flex flex-1 flex-col px-2 pb-2 pt-4">
-              <Link
-                href={`/food/${food.id}`}
-                className="
+                {/* محتوا */}
+                <div className="flex flex-1 flex-col px-2 pb-2 pt-4">
+                  <Link
+                    href={`/food/${food.id}`}
+                    className="
                   group/title
                   rounded-lg
                   outline-none
                   focus-visible:ring-2
                   focus-visible:ring-emerald-500
                 "
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <h3
-                    className="
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <h3
+                        className="
                       line-clamp-1
                       text-lg font-bold
                       text-slate-800
@@ -145,40 +164,56 @@ export default function FoodPageContent() {
                       group-hover/title:text-emerald-700
                       group-hover:text-emerald-800
                     "
-                  >
-                    {food.name}
-                  </h3>
+                      >
+                        {food.name}
+                      </h3>
+                    </div>
+                  </Link>
+
+                  {/* اطلاعات غذا */}
+                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-500">
+                    <span className="flex items-center gap-1.5">
+                      <Clock size={14} className="text-emerald-600" />
+                      ۳۰ دقیقه
+                    </span>
+
+                    <span className="h-3 w-px bg-slate-200" />
+
+                    <span className="flex items-center gap-1.5">
+                      <Star
+                        size={14}
+                        className="fill-amber-400 text-amber-400"
+                      />
+                      ۴.۸
+                    </span>
+
+                    <span className="h-3 w-px bg-slate-200" />
+
+                    <span className="flex items-center gap-1.5">
+                      <Flame size={14} className="text-orange-500" />
+                      آسان
+                    </span>
+                  </div>
                 </div>
-              </Link>
+              </article>
+            );
+          })
+        ) : (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-16 text-center">
+            <span className="mb-3 text-5xl">🍽️</span>
 
-              {/* اطلاعات غذا */}
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-500">
-                <span className="flex items-center gap-1.5">
-                  <Clock size={14} className="text-emerald-600" />
-                  ۳۰ دقیقه
-                </span>
+            <h3 className="text-lg font-bold text-slate-800">
+              هنوز غذایی ثبت نشده
+            </h3>
 
-                <span className="h-3 w-px bg-slate-200" />
+            <p className="mt-1 text-sm text-slate-500">
+              غذاهای جدید پس از ثبت، اینجا نمایش داده می‌شوند.
+            </p>
+          </div>
+        )}
 
-                <span className="flex items-center gap-1.5">
-                  <Star
-                    size={14}
-                    className="fill-amber-400 text-amber-400"
-                  />
-                  ۴.۸
-                </span>
 
-                <span className="h-3 w-px bg-slate-200" />
-
-                <span className="flex items-center gap-1.5">
-                  <Flame size={14} className="text-orange-500" />
-                  آسان
-                </span>
-              </div>
-            </div>
-          </article>
-        );
-      })}
-    </div>
+      </div>
+    </>
   );
 }

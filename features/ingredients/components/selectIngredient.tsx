@@ -3,16 +3,23 @@
 import { useEffect, useState } from "react";
 import useGetAllIngredients from "@/features/ingredients/hooks/useGetAllIngredients";
 import { parseApiError } from "@/utils/apiError";
+import { IIngredientItem } from "../types/Ingredient";
+
+interface SelectedIngredient {
+    id: string;
+    name: string;
+}
 
 interface SelectIngredientProps {
     value?: string;
-
-    onSelect: (id: string) => void;
+    onSelect?: (id: string) => void;
+    onIngredientSelect?: (ingredient: IIngredientItem) => void;
 }
 
 export default function SelectIngredient({
     value = "",
     onSelect,
+    onIngredientSelect
 }: SelectIngredientProps) {
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -40,9 +47,16 @@ export default function SelectIngredient({
         setSearchTerm(searchInput.trim());
     };
 
-    const handleIngredientSelect = (id: string) => {
-        setSelectedId(id);
-        onSelect(id);
+    // const handleIngredientSelect = (id: string) => {
+    //     setSelectedId(id);
+    //     onSelect(id);
+    // };
+
+    const handleIngredientSelect = (ingredient: IIngredientItem) => {
+        setSelectedId(ingredient.id);
+
+        onSelect?.(ingredient.id);
+        onIngredientSelect?.(ingredient);
     };
 
     if (isError) {
@@ -101,7 +115,7 @@ export default function SelectIngredient({
                         در حال بارگذاری...
                     </p>
                 ) : ingredients &&
-                  ingredients.length > 0 ? (
+                    ingredients.length > 0 ? (
                     // <div className="flex flex-col gap-1">
                     <div className="grid grid-cols-2 gap-1.5">
                         {ingredients.map((ingredient) => (
@@ -109,18 +123,15 @@ export default function SelectIngredient({
                                 key={ingredient.id}
                                 type="button"
                                 onClick={() =>
-                                    handleIngredientSelect(
-                                        ingredient.id
-                                    )
+                                    handleIngredientSelect(ingredient)
                                 }
                                 className={`
                                     rounded-md px-3 py-2 text-right
                                     transition-colors
-                                    ${
-                                        ingredient.id ===
+                                    ${ingredient.id ===
                                         selectedId
-                                            ? "bg-emerald-200 text-emerald-900"
-                                            : "bg-white hover:bg-emerald-50"
+                                        ? "bg-emerald-200 text-emerald-900"
+                                        : "bg-white hover:bg-emerald-50"
                                     }
                                 `}
                             >
