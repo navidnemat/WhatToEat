@@ -10,20 +10,19 @@ import LoadingComponent from "@/shared/components/loading";
 import { parseApiError } from "@/utils/apiError";
 import { getFoodImageUrl } from "@/utils/image";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2, ShoppingCart, Heart } from "lucide-react";
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import AddToFavoriteListHook from "@/features/favoriteList/hooks/useAddToFavoriteList";
-import { AddFavoriteDto } from "@/features/favoriteList/types/addFavorite";
-import Food from "../page";
+import DOMPurify from "dompurify";
 
 export default function FoodDetail() {
 
     const { id } = useParams<{ id: string }>();
-    const { user, loading } = useAuth()
+    const { user } = useAuth()
 
     const [pendingIngredientId, setPendingIngredientId] = useState<string | null>(null);
-    
+
     const [isClick, setIsClick] = useState(false)
 
     const {
@@ -103,7 +102,7 @@ export default function FoodDetail() {
                     AppToast.error(parsed.message ?? "خطایی رخ داد");
                 },
                 onSettled: () => {
-                    
+
                 },
             }
         )
@@ -282,9 +281,16 @@ export default function FoodDetail() {
                     <div className="">
                         <h3 className="text-2xl drop-shadow-lg text-shadow-sm mb-3">طرز تهیه</h3>
 
-                        <div className="leading-8 text-justify">
+                        {/*<div className="leading-8 text-justify">
                             {data?.recipe}
-                        </div>
+                        </div>*/}
+
+                        <div
+                            className="tiptap leading-8 text-justify"
+                            dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(data?.recipe ?? ""),
+                            }}
+                        />
                     </div>
 
                 </div>

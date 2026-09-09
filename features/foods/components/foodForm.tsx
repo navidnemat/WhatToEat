@@ -11,6 +11,7 @@ import {
     UpdateFoodFormData,
     UpdateFoodSchema,
 } from "../schemas/UpdateFood.schema";
+import RichTextEditor from "@/shared/components/rich-text-editor/RichTextEditor";
 
 interface FoodFormProps {
     title?: string;
@@ -59,6 +60,7 @@ export default function FoodForm({
         register,
         handleSubmit,
         reset,
+        setValue,
         formState: { errors },
     } = useForm<UpdateFoodFormData>({
         resolver: zodResolver(UpdateFoodSchema),
@@ -133,6 +135,7 @@ export default function FoodForm({
                         fieldErrors?.Name?.[0]
                     }
                 />
+
             </div>
 
             <div className="flex flex-col gap-2">
@@ -179,7 +182,7 @@ export default function FoodForm({
                     طرز تهیه
                 </label>
 
-                <TextareaAutosize
+                {/* <TextareaAutosize
                     minRows={5}
                     placeholder="دستور پخت را وارد کنید..."
                     {...register("recipe")}
@@ -192,6 +195,16 @@ export default function FoodForm({
                             : "border-gray-300"
                         }
                     `}
+                /> */}
+
+                <RichTextEditor
+                    content={defaultValues?.recipe ?? ""}
+                    onChange={(value) => {
+                        setValue("recipe", value, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                        });
+                    }}
                 />
 
                 {(errors.recipe?.message ||

@@ -185,7 +185,7 @@ export default function AdminGetFoods() {
                 open={isCreateModalOpen}
                 onOpenChange={setIsCreateModalOpen}
                 title="افزودن غذای جدید"
-                size="xs"
+                size="xl"
             >
                 <CreateFood
                     onSuccess={() => setIsCreateModalOpen(false)} />

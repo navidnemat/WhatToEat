@@ -1,5 +1,6 @@
 import { getFoodImageUrl } from "@/utils/image";
 import { IFoodDetailDto } from "../types/Food";
+import DOMPurify from "dompurify";
 
 interface props {
     food?: IFoodDetailDto
@@ -25,14 +26,19 @@ export default function FoodInfoCard({ food }: props) {
                     </div>
 
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                     <div className="text-2xl font-bold text-gray-800">{food?.name}</div>
                     <div className="text-gray-500 mt-1">دسته بندی: <span className="text-emerald-600 font-medium">{food?.categoryName}</span></div>
                 </div>
             </div>
 
-            <p className="leading-7 text-justify mt-3">{food?.recipe}</p>
+            <div
+                className="tiptap leading-8 text-justify mt-3"
+                dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(food?.recipe ?? ""),
+                }}
+            />
         </div>
     )
 }
