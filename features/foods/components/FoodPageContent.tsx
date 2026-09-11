@@ -18,18 +18,16 @@ import FoodFilter from "./foodFilter";
 
 export default function FoodPageContent() {
 
-  const [filter, setFilter] = useState<IFoodQueryParams>({
-    search: "",
-    categoryId: undefined,
-    includedIngredientIds: [],
-    excludedIngredientIds: [],
-  });
-
-  console.log("CURRENT FILTER:", filter);
-
   const searchParams = useSearchParams();
 
   const categoryId = searchParams.get("categoryId");
+
+  const [filter, setFilter] = useState<IFoodQueryParams>({
+    search: "",
+    categoryId: categoryId  || undefined,
+    includedIngredientIds: [],
+    excludedIngredientIds: [],
+  });
 
   const { data, isLoading, isError, error } = useGetAllFoods(filter);
 
