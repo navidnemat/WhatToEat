@@ -13,4 +13,5 @@ export const queryKeys = {
     foodsFiltered: (params: IFoodQueryParams) => [...queryKeys.foods, params],
     shoppingList: ["shopping-list"] as const,
     favoriteList: ["favorite-list"] as const,
+    user: ["user"] as const,
 }

@@ -21,6 +21,7 @@ type AuthContextType = {
     login: (username: string, password: string) => Promise<void>;
     register: (username: string, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
     login: async () => { },
     register: async () => { },
     logout: async () => { },
+    refreshUser: async () => { },
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -38,10 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // 🔍 بار اول لود شدن اپ، چک می‌کنیم کاربر لاگین هست یا نه
     useEffect(() => {
-        api.get("/account/me")
-            .then((res) => setUser(res.data))
-            .catch(() => setUser(null))
-            .finally(() => setLoading(false));
+        refreshUser().finally(() => setLoading(false));
     }, []);
 
     // 🟢 لاگین
@@ -91,8 +90,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const refreshUser = async () => {
+        try {
+            const { data } = await api.get("/account/me");
+            setUser(data);
+        } catch {
+            setUser(null);
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{
+            user,
+            loading,
+            login,
+            register,
+            logout,
+            refreshUser
+        }}>
             {children}
         </AuthContext.Provider>
     );
